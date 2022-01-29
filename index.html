@@ -71,12 +71,13 @@
     let audioContext;
     let isInit = false;
     const audioEl = document.getElementById('audioEl');
+    const audio = new Audio();
+    audio.autoplay = true;
 
 
     function playVoice(voice) {
-      const audio = new Audio();
-      audio.autoplay = true;
       audio.src = URL.createObjectURL(voice);
+      confirm('播放吗？') && audio.play();
       // const audioUrl = 
       // audioEl.src = audioUrl;
       // audioEl.play();
