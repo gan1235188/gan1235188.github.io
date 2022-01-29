@@ -10,12 +10,53 @@
   <link rel="apple-touch-icon" sizes="114x114" href="./assets/icon.png" />
   <link rel="apple-touch-startup-image" href="./assets/icon.png" />
   <title>Calm</title>
+  <style type="text/css">
+    .wrap {
+      position: fixed;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    button {
+      width: 40vw;
+    }
+
+    .btn-box {
+      display: flex;
+    }
+
+    button {
+      border: none;
+      color: #fff;
+      height: 56px;
+      font-size: 18px;
+    }
+
+    #start {
+      background-color: #409eff;
+    }
+
+    #stop {
+      background-color: #f56c6c;
+    }
+
+    button:disabled {
+      opacity: .7;
+    }
+  </style>
 </head>
 
 <body>
-  <p id="status">已停止</p>
-  <button id="start">开始</button>
-  <button id="stop">停止</button>
+  <div class="wrap">
+    <p id="status">已停止</p>
+    <div class="btn-box">
+      <button id="start">开始</button>
+      <button disabled id="stop">停止</button>
+    </div>
+  </div>
   <audio id="audioEl"></audio>
   <script>
     document.getElementById("start").addEventListener('click', start);
@@ -27,6 +68,7 @@
     let mediaRecorder;
     let stream;
     let audioContext;
+    let isInit = false;
     const audioEl = document.getElementById('audioEl');
 
 
@@ -36,9 +78,14 @@
       audioEl.play();
     }
 
-    async function start() {
+    async function init() {
+      isInit = true;
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioContext = new AudioContext();
+    }
+
+    async function start() {
+      !isInit && await init();
 
       const analyser = audioContext.createAnalyser();
       mediaRecorder = new MediaRecorder(stream);
@@ -66,6 +113,7 @@
 
       document.getElementById("status").innerText = "运行中。。。";
       document.getElementById("start").setAttribute('disabled', '');
+      document.getElementById("stop").removeAttribute('disabled');
 
       let time = Date.now();
       timer = setInterval(() => {
@@ -115,10 +163,12 @@
     }
 
     function stop() {
+      stopRecord(mediaRecorder);
       clearInterval(timer);
       streamSource.disconnect();
       document.getElementById("status").innerText = "已停止";
       document.getElementById("start").removeAttribute('disabled');
+      document.getElementById("stop").setAttribute('disabled', '');
     }
   </script>
 </body>
