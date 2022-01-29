@@ -73,10 +73,13 @@
     const audioEl = document.getElementById('audioEl');
 
 
-    function playVoice(audio) {
-      const audioUrl = URL.createObjectURL(audio);
-      audioEl.src = audioUrl;
-      audioEl.play();
+    function playVoice(voice) {
+      const audio = new Audio();
+      audio.autoplay = true;
+      audio.src = URL.createObjectURL(voice);
+      // const audioUrl = 
+      // audioEl.src = audioUrl;
+      // audioEl.play();
     }
 
     async function init() {
