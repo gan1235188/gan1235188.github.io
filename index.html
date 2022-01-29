@@ -44,6 +44,11 @@
       background-color: #f56c6c;
     }
 
+    #autoPlay {
+      background-color: #000;
+      display: none;
+    }
+
     button:disabled {
       opacity: .7;
     }
@@ -56,28 +61,45 @@
     <div class="btn-box">
       <button id="start">开始</button>
       <button disabled id="stop">停止</button>
+      <button id="autoPlay">授权自动播放</button>
     </div>
   </div>
   <audio id="audioEl"></audio>
   <script>
-    document.getElementById("start").addEventListener('click', start);
-    document.getElementById("stop").addEventListener('click', stop);
+    const audioEl = document.getElementById('audioEl');
+    const statusEl = document.getElementById("status");
+    const startEl = document.getElementById("start");
+    const stopEl = document.getElementById("stop");
+    const autoPlayEl = document.getElementById("autoPlay");
 
+    startEl.addEventListener('click', start);
+    stopEl.addEventListener('click', stop);
+
+    const audio = new Audio();
     const timeSpace = 1000;
+
     let streamSource;
     let timer;
     let mediaRecorder;
     let stream;
     let audioContext;
     let isInit = false;
-    const audioEl = document.getElementById('audioEl');
-    const audio = new Audio();
-    audio.autoplay = true;
+    let isAllowAutoPlay = false;
 
+    autoPlayEl.addEventListener('click', () => {
+      isAllowAutoPlay = true;
+      autoPlayEl.style.display = "none";
+      audio.play();
+    });
 
     function playVoice(voice) {
       audio.src = URL.createObjectURL(voice);
-      confirm('播放吗？') && audio.play();
+      if (isAllowAutoPlay) {
+        audio.play();
+      } else {
+        autoPlayEl.style.display = "block";
+        alert("请点击自动播放来授权自动播放权限!");
+      }
       // const audioUrl = 
       // audioEl.src = audioUrl;
       // audioEl.play();
@@ -116,9 +138,9 @@
 
       startRecord(mediaRecorder);
 
-      document.getElementById("status").innerText = "运行中。。。";
-      document.getElementById("start").setAttribute('disabled', '');
-      document.getElementById("stop").removeAttribute('disabled');
+      statusEl.innerText = "运行中。。。";
+      startEl.setAttribute('disabled', '');
+      stopEl.removeAttribute('disabled');
 
       let time = Date.now();
       timer = setInterval(() => {
@@ -142,7 +164,7 @@
       function isLouder() {
         let loudTimes = 0;
         for (let i = 0; i < last.length; i++) {
-          if (last[i] > 10) {
+          if (last[i] > 100) {
             if (++loudTimes > 3) {
               return true;
             }
@@ -171,9 +193,9 @@
       stopRecord(mediaRecorder);
       clearInterval(timer);
       streamSource.disconnect();
-      document.getElementById("status").innerText = "已停止";
-      document.getElementById("start").removeAttribute('disabled');
-      document.getElementById("stop").setAttribute('disabled', '');
+      statusEl.innerText = "已停止";
+      startEl.removeAttribute('disabled');
+      stopEl.setAttribute('disabled', '');
     }
   </script>
 </body>
